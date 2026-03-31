@@ -232,27 +232,10 @@
     border-radius: 7px;
   }
 
-  /* Mascot image */
-  .mascot-wrap {
-    width: 100%;
-    margin-bottom: 14px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: #f5eed8; /* matches the illustration's cream bg */
-  }
-
-  .mascot-wrap img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
   @media (max-width: 600px) {
     body { padding: 1rem; }
     td { width: 26px; height: 26px; font-size: 11px; }
     .words-panel { max-width: 100%; }
-    .mascot-wrap { max-width: 320px; margin: 0 auto 14px; }
   }
 </style>
 </head>
@@ -297,7 +280,7 @@
 </div>
 
 <script>
-const WORDS = ["CYBERSECURITY","DETROITPBS","PHISHING","QUISHING","SMISHING","AWARENESS","DETECTION","PATCH","CYBERSENTINEL","FIREWALL","MALWARE","THREATACTOR","SECURITY","MFA","ENCRYPTION","RANSOMWARE"];
+const WORDS = ["AWARENESS","CYBERSECURITY","CYBERSENTINEL","DETECTION","DETROITPBS","ENCRYPTION","FIREWALL","MALWARE","MFA","PATCH","PHISHING","QUISHING","RANSOMWARE","SECURITY","SMISHING","THREATACTOR"];
 const SIZE = 20;
 let grid = [], placed = [], foundWords = new Set(), selecting = false, startCell = null, currentCells = [];
 
