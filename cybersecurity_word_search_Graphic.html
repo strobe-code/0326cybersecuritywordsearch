@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detroit PBS Cybersecurity Word Search</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070D14;
+    --surface: #0D1B2A;
+    --surface2: #132333;
+    --border: #1A3A5C;
+    --accent: #00E5FF;
+    --accent2: #00FF9D;
+    --text: #C8E6FF;
+    --text-dim: #5A8FAF;
+    --grid-bg: #0A1824;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    padding: 1.5rem;
+    background-image:
+      radial-gradient(ellipse at 10% 10%, rgba(0,229,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 90%, rgba(0,255,157,0.03) 0%, transparent 50%);
+  }
+
+  .header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .shield-icon { width: 28px; height: 28px; flex-shrink: 0; }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  h1 span { color: var(--accent); }
+
+  .sub {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.03em;
+  }
+
+  .layout {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .grid-section { flex-shrink: 0; }
+  #grid-wrap { overflow-x: auto; }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 2px;
+    user-select: none;
+    background: var(--grid-bg);
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  td {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.08s, color 0.08s;
+  }
+
+  td:hover { background: var(--surface2); color: var(--text); }
+  td.selecting { background: rgba(0,229,255,0.25); color: var(--accent); }
+
+  /* Found colors — 16 distinct vivid hues */
+  td.found-0  { background:#00E5FF; color:#00131A; }
+  td.found-1  { background:#00FF9D; color:#00180A; }
+  td.found-2  { background:#FF6B35; color:#1A0800; }
+  td.found-3  { background:#FFD700; color:#1A1200; }
+  td.found-4  { background:#BF5FFF; color:#150020; }
+  td.found-5  { background:#FF4081; color:#1A0010; }
+  td.found-6  { background:#18FFFF; color:#001A1A; }
+  td.found-7  { background:#69FF47; color:#041A00; }
+  td.found-8  { background:#FF9100; color:#1A0900; }
+  td.found-9  { background:#E040FB; color:#160020; }
+  td.found-10 { background:#40C4FF; color:#001525; }
+  td.found-11 { background:#CCFF90; color:#0C1A00; }
+  td.found-12 { background:#FF6E40; color:#1A0800; }
+  td.found-13 { background:#EA80FC; color:#1A0020; }
+  td.found-14 { background:#80D8FF; color:#001825; }
+  td.found-15 { background:#B9F6CA; color:#001A07; }
+
+  /* Word panel */
+  .words-panel { flex: 1; min-width: 180px; max-width: 240px; }
+
+  .panel-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: 'Share Tech Mono', monospace;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .word-list { display: flex; flex-direction: column; gap: 4px; }
+
+  .word-item {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--text);
+    padding: 5px 8px;
+    border-radius: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .word-item::before { content: '›'; color: var(--text-dim); font-size: 14px; }
+  .word-item.found { text-decoration: line-through; color: var(--text-dim); background: transparent; border-color: transparent; }
+  .word-item.found::before { content: '✓'; color: var(--accent2); }
+
+  /* Bottom */
+  .bottom-area { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .progress-bar-wrap { display: flex; align-items: center; gap: 10px; }
+
+  .progress-bar { flex: 1; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; max-width: 300px; }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  #progress-text { font-size: 12px; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; white-space: nowrap; }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    text-decoration: none;
+  }
+
+  .btn-submit:hover { background: var(--accent); color: var(--bg); }
+
+  #congrats-msg {
+    display: none;
+    padding: 12px 16px;
+    border: 1px solid var(--accent2);
+    border-radius: 6px;
+    background: rgba(0,255,157,0.05);
+  }
+
+  #congrats-msg p {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin-bottom: 10px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 1rem; }
+    td { width: 26px; height: 26px; font-size: 11px; }
+    .words-panel { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <svg class="shield-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14 2L4 6.5V13.5C4 19.25 8.4 24.65 14 26C19.6 24.65 24 19.25 24 13.5V6.5L14 2Z" stroke="#00E5FF" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M9 14L12.5 17.5L19 11" stroke="#00FF9D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h1>Detroit <span>PBS</span> Cybersecurity Word Search</h1>
+  </div>
+  <p class="sub">// Click and drag to highlight words — find all 16 hidden terms</p>
+</div>
+
+<div class="layout">
+  <div class="grid-section">
+    <div id="grid-wrap"></div>
+    <div class="bottom-area">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <span id="progress-text">0 / 16 found</span>
+      </div>
+      <div>
+        <a class="btn-submit" href="https://forms.gle/bVq6r81nTzgZ3uQc8" target="_blank">Submit Completion ↗</a>
+      </div>
+      <div id="congrats-msg">
+        <p>// All 16 words found. Mission complete!</p>
+        <a class="btn-submit" href="https://forms.gle/bVq6r81nTzgZ3uQc8" target="_blank">Submit your completion ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="words-panel">
+    <div class="panel-header">Target Words</div>
+    <div class="word-list" id="word-list"></div>
+  </div>
+</div>
+
+<script>
+const WORDS = ["CYBERSECURITY","DETROITPBS","PHISHING","QUISHING","SMISHING","AWARENESS","DETECTION","PATCH","CYBERSENTINEL","FIREWALL","MALWARE","THREATACTOR","SECURITY","MFA","ENCRYPTION","RANSOMWARE"];
+const SIZE = 20;
+let grid = [], placed = [], foundWords = new Set(), selecting = false, startCell = null, currentCells = [];
+
+function makeGrid() {
+  grid = Array.from({length: SIZE}, () => Array(SIZE).fill(''));
+  placed = [];
+  const dirs = [[0,1],[1,0],[0,-1],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
+  const shuffled = [...WORDS].sort(() => Math.random() - 0.5);
+  shuffled.forEach((word, wi) => {
+    let placed_ok = false;
+    for (let attempt = 0; attempt < 300 && !placed_ok; attempt++) {
+      const [dr, dc] = dirs[Math.floor(Math.random() * dirs.length)];
+      const r = Math.floor(Math.random() * SIZE), c = Math.floor(Math.random() * SIZE);
+      let ok = true, cells = [];
+      for (let i = 0; i < word.length; i++) {
+        const nr = r + dr * i, nc = c + dc * i;
+        if (nr < 0 || nr >= SIZE || nc < 0 || nc >= SIZE) { ok = false; break; }
+        if (grid[nr][nc] && grid[nr][nc] !== word[i]) { ok = false; break; }
+        cells.push([nr, nc]);
+      }
+      if (ok) {
+        cells.forEach(([nr, nc], i) => grid[nr][nc] = word[i]);
+        placed.push({word, cells, idx: wi});
+        placed_ok = true;
+      }
+    }
+  });
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for (let r = 0; r < SIZE; r++)
+    for (let c = 0; c < SIZE; c++)
+      if (!grid[r][c]) grid[r][c] = letters[Math.floor(Math.random() * 26)];
+}
+
+function render() {
+  const wrap = document.getElementById('grid-wrap');
+  wrap.innerHTML = '';
+  const table = document.createElement('table');
+  for (let r = 0; r < SIZE; r++) {
+    const tr = document.createElement('tr');
+    for (let c = 0; c < SIZE; c++) {
+      const td = document.createElement('td');
+      td.textContent = grid[r][c];
+      td.dataset.r = r; td.dataset.c = c;
+      td.addEventListener('mousedown', e => { e.preventDefault(); startSelect(r, c); });
+      td.addEventListener('mouseover', () => { if (selecting) updateSelect(r, c); });
+      td.addEventListener('touchstart', e => { e.preventDefault(); startSelect(r, c); }, {passive: false});
+      td.addEventListener('touchmove', e => {
+        e.preventDefault();
+        const t = e.touches[0];
+        const el = document.elementFromPoint(t.clientX, t.clientY);
+        if (el && el.tagName === 'TD') updateSelect(+el.dataset.r, +el.dataset.c);
+      }, {passive: false});
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
+  document.addEventListener('mouseup', endSelect);
+  document.addEventListener('touchend', endSelect);
+  wrap.appendChild(table);
+  renderWords();
+  updateProgress();
+}
+
+function renderWords() {
+  const wl = document.getElementById('word-list');
+  wl.innerHTML = '';
+  WORDS.forEach(w => {
+    const d = document.createElement('div');
+    d.className = 'word-item' + (foundWords.has(w) ? ' found' : '');
+    d.textContent = w;
+    wl.appendChild(d);
+  });
+}
+
+function getCell(r, c) { return document.querySelector(`td[data-r="${r}"][data-c="${c}"]`); }
+
+function startSelect(r, c) {
+  selecting = true; startCell = {r, c}; currentCells = [[r, c]];
+  clearSelecting();
+  getCell(r, c)?.classList.add('selecting');
+}
+
+function updateSelect(r, c) {
+  if (!selecting || !startCell) return;
+  clearSelecting();
+  const dr = r - startCell.r, dc = c - startCell.c;
+  if (Math.max(Math.abs(dr), Math.abs(dc)) === 0) {
+    currentCells = [[startCell.r, startCell.c]];
+    getCell(startCell.r, startCell.c)?.classList.add('selecting');
+    return;
+  }
+  let sr = 0, sc = 0;
+  if (dr !== 0) sr = dr / Math.abs(dr);
+  if (dc !== 0) sc = dc / Math.abs(dc);
+  if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) {
+    if (Math.abs(dr) > Math.abs(dc)) sc = 0; else sr = 0;
+  }
+  currentCells = [];
+  const steps = Math.max(Math.abs(sr ? r - startCell.r : 0), Math.abs(sc ? c - startCell.c : 0));
+  for (let i = 0; i <= steps; i++) {
+    const nr = startCell.r + sr * i, nc = startCell.c + sc * i;
+    if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+      currentCells.push([nr, nc]);
+      getCell(nr, nc)?.classList.add('selecting');
+    }
+  }
+}
+
+function clearSelecting() {
+  document.querySelectorAll('td.selecting').forEach(td => td.classList.remove('selecting'));
+}
+
+function endSelect() {
+  if (!selecting) return;
+  selecting = false;
+  const selected = currentCells.map(([r, c]) => grid[r][c]).join('');
+  const selectedRev = selected.split('').reverse().join('');
+  let matched = null;
+  placed.forEach(p => {
+    if (!foundWords.has(p.word)) {
+      const pStr = p.cells.map(([r, c]) => grid[r][c]).join('');
+      if (pStr === selected || pStr === selectedRev) matched = p;
+    }
+  });
+  if (matched) {
+    foundWords.add(matched.word);
+    matched.cells.forEach(([r, c]) => {
+      const td = getCell(r, c);
+      if (td) { td.classList.remove('selecting'); td.className = `found-${matched.idx}`; }
+    });
+    renderWords();
+    updateProgress();
+    if (foundWords.size === WORDS.length) {
+      document.getElementById('congrats-msg').style.display = 'block';
+    }
+  } else {
+    clearSelecting();
+  }
+  currentCells = [];
+}
+
+function updateProgress() {
+  const pct = (foundWords.size / WORDS.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${foundWords.size} / ${WORDS.length} found`;
+}
+
+makeGrid();
+render();
+</script>
+</body>
+</html>
