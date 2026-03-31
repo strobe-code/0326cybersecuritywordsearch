@@ -119,7 +119,7 @@
   td.found-15 { background:#B9F6CA; color:#001A07; }
 
   /* Word panel */
-  .words-panel { flex: 1; min-width: 180px; max-width: 240px; }
+  .words-panel { flex: 1; min-width: 200px; max-width: 280px; }
 
   .panel-header {
     font-size: 11px;
@@ -193,6 +193,14 @@
 
   .btn-submit:hover { background: var(--accent); color: var(--bg); }
 
+  .btn-submit.disabled {
+    border-color: var(--border);
+    color: var(--text-dim);
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.45;
+  }
+
   #congrats-msg {
     display: none;
     padding: 12px 16px;
@@ -209,10 +217,42 @@
     font-family: 'Share Tech Mono', monospace;
   }
 
+  /* Mascot image */
+  .mascot-wrap {
+    margin-bottom: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #d4c9a8;
+  }
+
+  .mascot-wrap img {
+    width: 100%;
+    display: block;
+    border-radius: 7px;
+  }
+
+  /* Mascot image */
+  .mascot-wrap {
+    width: 100%;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #f5eed8; /* matches the illustration's cream bg */
+  }
+
+  .mascot-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
   @media (max-width: 600px) {
     body { padding: 1rem; }
     td { width: 26px; height: 26px; font-size: 11px; }
     .words-panel { max-width: 100%; }
+    .mascot-wrap { max-width: 320px; margin: 0 auto 14px; }
   }
 </style>
 </head>
@@ -238,7 +278,7 @@
         <span id="progress-text">0 / 16 found</span>
       </div>
       <div>
-        <a class="btn-submit" href="https://forms.gle/bVq6r81nTzgZ3uQc8" target="_blank">Submit Completion ↗</a>
+        <a class="btn-submit disabled" id="btn-submit-main" href="https://forms.gle/bVq6r81nTzgZ3uQc8" target="_blank">Submit Completion ↗</a>
       </div>
       <div id="congrats-msg">
         <p>// All 16 words found. Mission complete!</p>
@@ -248,6 +288,9 @@
   </div>
 
   <div class="words-panel">
+    <div class="mascot-wrap">
+      <img src="CyberSentinelPatch_WordSearch.png" alt="CyberSentinel and his dog companion doing a word search" />
+    </div>
     <div class="panel-header">Target Words</div>
     <div class="word-list" id="word-list"></div>
   </div>
@@ -389,6 +432,8 @@ function endSelect() {
     updateProgress();
     if (foundWords.size === WORDS.length) {
       document.getElementById('congrats-msg').style.display = 'block';
+      const btn = document.getElementById('btn-submit-main');
+      btn.classList.remove('disabled');
     }
   } else {
     clearSelecting();
